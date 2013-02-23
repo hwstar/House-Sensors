@@ -31,7 +31,16 @@ foreach($sources as $src){
 		fatal("Could not query database: ".$e->getMessage());
 	}
 	if($row['value']){
-		$updates[$src] = $row['value'];
+		$v = $row['value'];
+		if($config[$src]['scale-function']){
+			$scale_function = $config[$src]['scale-function'];
+			$v = eval("return( ".$scale_function." );");
+			if($v == FALSE){
+				warn("Bad scale function in source ".$src);
+				$v = 0;
+			}		
+		}
+		$updates[$src] = $v;
 	}
 	else{
 		warn("cron.php: key $k returned nothing");

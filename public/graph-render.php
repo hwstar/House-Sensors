@@ -51,11 +51,11 @@ if(!$fail){
 	}	
 
 
-	if($config[$source]['gprint_numeric_format']){
-		$gprint_numeric_format = $config[$source]['gprint_numeric_format'];
+	if($config[$source]['last-numeric-format']){
+		$last_numeric_format = $config[$source]['last-numeric-format'];
 	}
 	else{
-		$gprint_numeric_format = "%2.1lf";
+		$last_numeric_format = "2.1lf";
 	}
 
 	if(!$config[$source]['color']){
@@ -72,7 +72,7 @@ if(!$fail){
 	"--title" => $description,
 	"DEF:graph"."=".$rrdfile.":".$source.":".'LAST',
 	"LINE1:graph"."#".$color.":".$legend,
-	"GPRINT:graph".":".'LAST'.":"."Last Value\\".":".$gprint_numeric_format." ".$units[0]
+	"GPRINT:graph".":".'LAST'.":"."Last Value\\".":%".$last_numeric_format." ".$units[0]
 	);
 
 	/* Generate graph */
@@ -94,7 +94,7 @@ if(!$fail){
 	echo $output['image'];
 }
 else{
-	print "Could not display graph";
+	print "graph_render.php: Could not display graph";
 }
 
  
