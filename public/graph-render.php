@@ -1,51 +1,102 @@
 <?php
 
-function fatal($emsg)
-{
-	error_log("Fatal: ".$emsg);
-	exit;
-}
+require_once "../lib/init.php";
+require_once "../lib/logging.php";
 
-function warn($msg)
-{
-	error_log("Warning: ".$wmsg);
-}
+$fail = 0;
 
-$datadir = dirname(__FILE__)."/../data";  
-$graph=$_GET['graph'];
-	
-	
 /* Sanity checks */
-	
-if(!$graph){
-	fatal("No graph name passed in get method");
+
+if(!$_GET || !$_GET['source']){
+	warn("graph_render.php: missing source");
+	$fail = 1;
 }
-	
-$file_parts = pathinfo($graph);	
-if(strcmp($file_parts['extension'], "png")){
-	fatal("Incorrect extension type");
+
+$source=$_GET['source'];
+
+
+if(!$fail){
+	if(!$source || !in_array($source, $sources)){
+		warn("graph_render.php: invalid source: ".$source);
+		$fail = 1;
+	}
 }
-	
-if(strlen($file_parts['directory'])){
-	fatal("Directory name not allowed");
+
+if(!$fail){
+	/* Set defaults */
+
+	if(!$config[$source]['units']){
+		$units[0] = "U";
+		$units[1] = "Units";
+	}
+	else{
+		$units = explode(",", $config[$source]['units'], 2);
+		if(!$units[1]){
+			$units[1] = $units[0];
+		}
+	}
+
+	if(!$config[$source]['description']){
+		$description = "Default Description";
+	}
+	else{
+		$description = $config[$source]['description'];
+	}
+
+	if(!$config[$source]['legend']){
+		$legend = $description;
+	}
+	else{
+		$legend = $config[$source]['legend'];
+	}	
+
+
+	if($config[$source]['gprint_numeric_format']){
+		$gprint_numeric_format = $config[$source]['gprint_numeric_format'];
+	}
+	else{
+		$gprint_numeric_format = "%2.1lf";
+	}
+
+	if(!$config[$source]['color']){
+		$color = "00FF00";
+	}
+	else{
+		$color = $config[$source]['color'];
+	}
+
+	/* Create graph options array */
+
+	$graphoptions = array(
+	"--vertical-label" => $units[1],
+	"--title" => $description,
+	"DEF:graph"."=".$rrdfile.":".$source.":".'LAST',
+	"LINE1:graph"."#".$color.":".$legend,
+	"GPRINT:graph".":".'LAST'.":"."Last Value\\".":".$gprint_numeric_format." ".$units[0]
+	);
+
+	/* Generate graph */
+	try{
+		$graph = new RRDGraph("-"); // output to array
+		$graph->setOptions($graphoptions);
+		$output = $graph->saveVerbose();
+	} catch(Exception $e){
+		$fail = 1;
+		warn("graph_render.php: could not generate graph for: $source, ".$e->getMessage());
+	}
 }
-	
-if(!file_exists($datadir."/".$graph)){
-	fatal("Graph file does not exist");
-}
-		
-    /* Attempt to open file */
-$fp = fopen($datadir."/".$graph, 'rb'); // stream the image directly from the file
   
-if(!$fp){
-	fatal("Could not open graph file");
-}
-  
+
 /* Output graph */
-header("Content-Type: image/png");
-  
-fpassthru($fp);
-close($fp);
+
+if(!$fail){
+	header("Content-Type: image/png");
+	echo $output['image'];
+}
+else{
+	print "Could not display graph";
+}
+
  
 exit;
 ?>

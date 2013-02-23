@@ -1,45 +1,53 @@
+#!/usr/bin/php
 <?php
+$path  = dirname(realpath((dirname(__FILE__))));
+require_once "$path/lib/init.php";
+require_once "$path/lib/logging.php";
+require_once "$path/lib/db.php";
 
-function fatal($emsg)
-{
-	error_log("Fatal: ".$emsg);
-	exit;
-}
-
-function warn($msg)
-{
-	error_log("Warning: ".$wmsg);
+if(!file_exists($rrdfile)){
+	$initscript = $utildir."/rrdinit.php";
+	echo `php $initscript`;
 }
 	
-
-$mydir =  dirname(__FILE__);
-
-$cfgloc = $mydir."/../conf";
-$rrdloc = $mydir."/../graphs";
-
-$config = parse_ini_file($cfgloc."/hs.conf", 1);
-
-// In no config file, exit
-if(!$config){
-	fatal("No config file");
+// Update the RRA
+try{
+	$rra = new RRDUpdater($rrdfile);
+} catch(Exception $e){
+	fatal("Could not access RRA in file: ".$rrdfile.": ".$e->getMessage());
 }
 
-if(!array_key_exists("general", $config)){
-	fatal("Config file missing general section");
-}
-// Get source keys
-$sources = array();
-foreach(array_keys($config) as $k){
-	if(strcmp("general", $k)){
-		array_push($sources, $k);
+$updates = array();
+foreach($sources as $src){
+	$key = $config[$src]['key'];
+	$table = $config['general']['table'];
+	$sth = $pdo->prepare("SELECT * FROM $table WHERE source=?");
+	
+	try{
+		$sth->execute(array($key));
+		$row = $sth->fetch(PDO::FETCH_ASSOC);
+		
+	} catch (Exception $e){
+		fatal("Could not query database: ".$e->getMessage());
+	}
+	if($row['value']){
+		$updates[$src] = $row['value'];
+	}
+	else{
+		warn("cron.php: key $k returned nothing");
 	}
 }
-
-
-// Exit if no sources
-if(count($sources) < 1){
-	fatal("No sources defined");
+if(count($updates) > 0){
+	try{
+		$rra->update($updates);
+	} catch (Exception $e){
+		fatal("Could not update rra: ".$e->getMessage());
+	}
 }
+exit(0);
 
-	
 ?>
+
+
+
+
