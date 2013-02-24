@@ -25,7 +25,7 @@ if(!$fail){
 if(!$fail){
 	/* Set defaults */
 
-	if(!$config[$source]['units']){
+	if(!isset($config[$source]['units'])){
 		$units[0] = "U";
 		$units[1] = "Units";
 	}
@@ -36,29 +36,36 @@ if(!$fail){
 		}
 	}
 
-	if(!$config[$source]['description']){
+	if(!isset($config[$source]['description'])){
 		$description = "Default Description";
 	}
 	else{
 		$description = $config[$source]['description'];
 	}
-
-	if(!$config[$source]['legend']){
-		$legend = $description;
+	
+	if(!isset($config[$source]['graph-title'])){
+		$graph_title = $description;
 	}
 	else{
-		$legend = $config[$source]['legend'];
+		$graph_title = $config[$source]['graph-title'];
+	}
+
+	if(!isset($config[$source]['graph-legend'])){
+		$legend = $graph_title;
+	}
+	else{
+		$legend = $config[$source]['graph-legend'];
 	}	
 
 
-	if($config[$source]['last-numeric-format']){
+	if(isset($config[$source]['last-numeric-format'])){
 		$last_numeric_format = $config[$source]['last-numeric-format'];
 	}
 	else{
 		$last_numeric_format = "2.1lf";
 	}
 
-	if(!$config[$source]['color']){
+	if(!isset($config[$source]['color'])){
 		$color = "00FF00";
 	}
 	else{
@@ -69,7 +76,7 @@ if(!$fail){
 
 	$graphoptions = array(
 	"--vertical-label" => $units[1],
-	"--title" => $description,
+	"--title" => $graph_title,
 	"DEF:graph"."=".$rrdfile.":".$source.":".'LAST',
 	"LINE1:graph"."#".$color.":".$legend,
 	"GPRINT:graph".":".'LAST'.":"."Last Value\\".":%".$last_numeric_format." ".$units[0]

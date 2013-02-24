@@ -12,20 +12,13 @@ header('Expires: 0'); // Proxies.
 
 /* PHP Functions */
 
-function display_table($cstring)
+function display_table($category)
 {
 	$i = 0;
 	global $pdo;
 	global $sources;
 	global $config;
 	global $categories;
-	
-	if(!$categories[$cstring]){
-		warn("No category named ".$string,__FILE__);
-		return;
-	}
-
-	$category = $categories[$cstring];
 
 	foreach($category as $src){
 		$key = $config[$src]['key'];
@@ -33,7 +26,8 @@ function display_table($cstring)
 		$result = $pdo->query("SELECT * FROM $table WHERE source='$key'");
 		if($result){
 			if(0 === $i){
-				print "<H2>$cstring</H2>\n";
+				$heading = $config[$src]['category'];
+				print "<H2>$heading</H2>\n";
 				print "<div class=\"CSS_Status_Tables\">\n";
 				print "<table>\n";
 				print "<tr>\n";
@@ -55,6 +49,21 @@ function display_table($cstring)
 		print "</div>\n";
 	}
 }
+
+function display_category($category)
+{
+	display_table($category);
+	foreach($category as $src){
+//		if($config[$src]['graph-type'] == 'none'){
+//			continue;
+//		}
+		print '<p />';
+		print "<img src=\"graph-render.php?source=$src\" />";
+		print '<p />';
+	}
+	
+}
+
 	
 ?>
 
@@ -71,10 +80,10 @@ function display_table($cstring)
 	
 <?php
 /* PHP main line code */
-
-display_table("Charge Controller");
-
-
+foreach($categories as $cat){
+	display_category($cat);
+}
+	
 
 ?>
 <!-- Static HTML closing tags -->

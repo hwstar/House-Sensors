@@ -22,6 +22,12 @@ $updates = array();
 foreach($sources as $src){
 	$key = $config[$src]['key'];
 	$table = $config['general']['table'];
+	
+	if(!isset($config[$src]['graph-type']) || $config[$src]['graph-type'] != 'standard'){
+		continue;
+	}
+	
+	
 	$sth = $pdo->prepare("SELECT * FROM $table WHERE source=?");
 	
 	try{
@@ -33,7 +39,7 @@ foreach($sources as $src){
 	}
 	if($row['value']){
 		$v = $row['value'];
-		if($config[$src]['scale-function']){
+		if(isset($config[$src]['scale-function'])){
 			$scale_function = $config[$src]['scale-function'];
 			$v = eval("return( ".$scale_function." );");
 			if($v == FALSE){
