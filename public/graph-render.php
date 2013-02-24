@@ -8,7 +8,7 @@ $fail = 0;
 /* Sanity checks */
 
 if(!$_GET || !$_GET['source']){
-	warn("graph_render.php: missing source");
+	warn("Missing source",__FILE__);
 	$fail = 1;
 }
 
@@ -17,7 +17,7 @@ $source=$_GET['source'];
 
 if(!$fail){
 	if(!$source || !in_array($source, $sources)){
-		warn("graph_render.php: invalid source: ".$source);
+		warn("Invalid source: ".$source,__FILE__);
 		$fail = 1;
 	}
 }
@@ -82,7 +82,7 @@ if(!$fail){
 		$output = $graph->saveVerbose();
 	} catch(Exception $e){
 		$fail = 1;
-		warn("graph_render.php: could not generate graph for: $source, ".$e->getMessage());
+		warn("Could not generate graph for: $source, ".$e->getMessage(),__FILE__);
 	}
 }
   

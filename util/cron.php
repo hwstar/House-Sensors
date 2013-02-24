@@ -8,13 +8,14 @@ require_once "$path/lib/db.php";
 if(!file_exists($rrdfile)){
 	$initscript = $utildir."/rrdinit.php";
 	echo `php $initscript`;
+	exit( 0 );
 }
 	
 // Update the RRA
 try{
 	$rra = new RRDUpdater($rrdfile);
 } catch(Exception $e){
-	fatal("Could not access RRA in file: ".$rrdfile.": ".$e->getMessage());
+	fatal("Could not access RRA in file: ".$rrdfile.": ".$e->getMessage(),__FILE__);
 }
 
 $updates = array();
@@ -28,7 +29,7 @@ foreach($sources as $src){
 		$row = $sth->fetch(PDO::FETCH_ASSOC);
 		
 	} catch (Exception $e){
-		fatal("Could not query database: ".$e->getMessage());
+		fatal("Could not query database: ".$e->getMessage(),__FILE__);
 	}
 	if($row['value']){
 		$v = $row['value'];
@@ -36,24 +37,24 @@ foreach($sources as $src){
 			$scale_function = $config[$src]['scale-function'];
 			$v = eval("return( ".$scale_function." );");
 			if($v == FALSE){
-				warn("Bad scale function in source ".$src);
+				warn("Bad scale function in source ".$src,__FILE__);
 				$v = 0;
 			}		
 		}
 		$updates[$src] = $v;
 	}
 	else{
-		warn("cron.php: key $k returned nothing");
+		warn("key $k returned nothing",__FILE__);
 	}
 }
 if(count($updates) > 0){
 	try{
 		$rra->update($updates);
 	} catch (Exception $e){
-		fatal("Could not update rra: ".$e->getMessage());
+		fatal("Could not update rra: ".$e->getMessage(),__FILE__);
 	}
 }
-exit(0);
+exit( 0 );
 
 ?>
 

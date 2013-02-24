@@ -11,11 +11,11 @@ $config = parse_ini_file($cfgloc."/hs.conf", 1);
 
 // In no config file, exit
 if(!$config){
-	error_log("Can't read config file $cfgloc/hs.conf");
+	error_log("init.php: Can't read config file $cfgloc/hs.conf");
 }
 
 if(!array_key_exists("general", $config)){
-	fatal("Config file missing general section");
+	error_log("init.php: Config file missing general section");
 }
 // Get source keys
 $sources = array();

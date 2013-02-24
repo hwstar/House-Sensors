@@ -1,18 +1,20 @@
 <?php
 // Log fatal error and exit
 
-function fatal($emsg)
+function fatal($emsg, $module = "?")
 {	
 	global $logfile;
-	error_log("Fatal: ".$emsg."\n", 3, $logfile);
+	$dt = strftime("%c");
+	error_log($dt." Fatal($module): ".$emsg."\n");
 	exit;
 }
 
 // Log warning and continue
 
-function warn($wmsg)
+function warn($wmsg, $module = "?")
 {
 	global $logfile;
-	error_log("Warning: ".$wmsg."\n", 3, $logfile);
+		$dt = strftime("%c");
+	error_log($dt." Warning($module): ".$wmsg."\n");
 }
 ?>

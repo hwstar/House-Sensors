@@ -24,5 +24,6 @@ $newrrd->addArchive("LAST:$x_factor:1:$records");
 $newrrd->save();
 
 print "Initialization complete\n";
+exit( 0 );
 
 ?>
