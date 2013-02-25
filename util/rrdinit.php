@@ -13,15 +13,15 @@ $newrrd = new RRDCreator($rrdfile, "now", 300);
 
 
 foreach($sources as $s){
-	if(isset($config[$s]['graph-type']) && $config[$s]['graph-type'] != 'none'){
-		$min = ($config[$s]['min']) ? $config[$s]['min'] : "U";
-		$max = ($config[$s]['max']) ? $config[$s]['max'] : "U";
+	if($config[$s]['graph-type'] != 'nograph'){
+		$min = $config[$s]['min'];
+		$max = $config[$s]['max'];
 		$newrrd->addDataSource("$s:GAUGE:600:$min:$max");
 		print "$s\n";
 	}
 }
-$records = (isset($config['general']['records'])) ? $config['general']['records'] : 288;
-$x_factor = (isset($config['general']['x-factor'])) ? $config['general']['x-factor'] : 0.5;
+$records = $config['general']['records'];
+$x_factor = $config['general']['x-factor'];
 $newrrd->addArchive("LAST:$x_factor:1:$records");
 $newrrd->save();
 

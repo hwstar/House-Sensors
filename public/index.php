@@ -52,14 +52,16 @@ function display_table($category)
 
 function display_category($category)
 {
+	global $config;
+	
 	display_table($category);
 	foreach($category as $src){
-//		if($config[$src]['graph-type'] == 'none'){
-//			continue;
-//		}
-		print '<p />';
-		print "<img src=\"graph-render.php?source=$src\" />";
-		print '<p />';
+		if($config[$src]['graph-type'] == 'nograph'){
+			continue;
+		}
+		print '<p>';
+		print "<img src=\"graph-render.php?source=$src\" />\n";
+		print '<p>';
 	}
 	
 }

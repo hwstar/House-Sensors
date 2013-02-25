@@ -23,7 +23,7 @@ foreach($sources as $src){
 	$key = $config[$src]['key'];
 	$table = $config['general']['table'];
 	
-	if(!isset($config[$src]['graph-type']) || $config[$src]['graph-type'] != 'standard'){
+	if($config[$src]['graph-type'] != 'standard'){
 		continue;
 	}
 	
