@@ -1,0 +1,4 @@
+This is a small program to read sensor values from a sqlite database and displaythem on a web page along with an optional RRDTOOL graph over the past 24 hours. 
+
+
+
