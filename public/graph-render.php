@@ -24,7 +24,7 @@ $fail = false;
 
 /* Sanity checks */
 
-if(!$_GET || !$_GET['source']){
+if(!isset($_GET) || !isset($_GET['source'])){
 	warn("Missing source",__FILE__);
 	$fail = true;
 }
@@ -32,19 +32,19 @@ if(!$_GET || !$_GET['source']){
 $source=$_GET['source'];
 
 
-if(!$fail){
+if(false === $fail){
 	if(!isset($source) || !in_array($source, $sources)){
 		warn("Invalid source: ".$source,__FILE__);
 		$fail = true;
 	}
 }
 
-if(!$fail){
+if(false === $fail){
 	/* Set defaults */
 
 
 	$units = explode(",", $config[$source]['units'], 2);
-	if(!$units[1]){
+	if(!isset($units[1])){
 		$units[1] = $units[0];
 	}
 	
@@ -89,7 +89,7 @@ if(!$fail){
 
 /* Output graph */
 
-if(!$fail){
+if(false === $fail){
 	header("Content-Type: image/png");
 	echo $output['image'];
 }

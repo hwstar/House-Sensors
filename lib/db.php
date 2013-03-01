@@ -19,7 +19,7 @@
 
 $db = $config['general']['db'];
 
-if(!file_exists($db)){
+if(false === file_exists($db)){
 	fatal("Database file: ".$db." does not exist",__FILE__);
 }
 

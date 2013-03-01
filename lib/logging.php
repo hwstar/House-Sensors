@@ -24,7 +24,7 @@ function fatal($emsg, $module = "?")
 {	
 	global $logfile;
 	$dt = strftime("%c");
-	error_log($dt." Fatal($module): ".$emsg."\n");
+	error_log($dt." Fatal($module): ".$emsg);
 	exit;
 }
 
@@ -34,6 +34,6 @@ function warn($wmsg, $module = "?")
 {
 	global $logfile;
 		$dt = strftime("%c");
-	error_log($dt." Warning($module): ".$wmsg."\n");
+	error_log($dt." Warning($module): ".$wmsg);
 }
 ?>
