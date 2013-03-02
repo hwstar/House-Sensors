@@ -36,6 +36,11 @@ if(false === file_exists($db)){
 	Log::fatal("Database file: ".$db." does not exist");
 }
 
+if(time() - filemtime($db) > 70){
+	Usermsgs::warning("Stale database file");
+	Log::warn("Stale database file. Is $db getting updated?");
+}
+
 try{
 	$pdo = new PDO($dsn);
 }
