@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,19 +17,22 @@
  * MA 02110-1301, USA.
  * 
  */
-
-$db = $config['general']['db'];
-
-if(false === file_exists($db)){
-	fatal("Database file: ".$db." does not exist",__FILE__);
+ 
+class Usermsgs
+{
+	/* Error method */
+	static function error($msg)
+	{
+		printf("<div class=\"error\">$msg</div>\n");
+	}
+	
+	/* Warning method */
+	static function warning($msg)
+	{
+		printf("<div class=\"warning\">$msg</div>\n");
+	}
+	
 }
 
-$dsn = "sqlite:".$db;
 
-try{
-	$pdo = new PDO($dsn);
-}
-catch(Exception $e){
-	fatal("Could not open database file ".$config['general']['db'].": ".$e->getMessage(),__FILE__);
-}
 ?>

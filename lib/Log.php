@@ -17,23 +17,43 @@
  * 
  */
 
+class Log{
+	
+	// Log fatal error and exit
 
-// Log fatal error and exit
+	static public function fatal($emsg)
+	{	
+		$bt =  debug_backtrace();
+		self::_log($emsg, "Fatal", $bt); 
+		exit ( 1 );
+	}
+	
+	// Log warning and continue
+	
+	static public function warn($wmsg)
+	{
+		$bt =  debug_backtrace();
+		self::_log($wmsg, "Warning", $bt); 
+	}
+	
+	// Log note and continue
+	
+	static public function note($nmsg)
+	{
+		
+		self::_log($nmsg, "Note"); 
+	}
+	
+	static private function _log($msg, $type, $bt = NULL)
+	{
+		if(isset($bt)){
+			$cf =  'File: '. $bt[0]['file'] . ' Line:  '. $bt[0]['line'];
+			error_log("$type($cf): $msg ");
+		}
+		else{
+			error_log("$type: $msg ");
+		}
+	}
 
-function fatal($emsg, $module = "?")
-{	
-	global $logfile;
-	$dt = strftime("%c");
-	error_log($dt." Fatal($module): ".$emsg);
-	exit;
-}
-
-// Log warning and continue
-
-function warn($wmsg, $module = "?")
-{
-	global $logfile;
-		$dt = strftime("%c");
-	error_log($dt." Warning($module): ".$wmsg);
 }
 ?>

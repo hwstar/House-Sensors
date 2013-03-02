@@ -16,16 +16,16 @@
  * MA 02110-1301, USA.
  * 
  */
-
+require_once "../lib/Log.php";
+require_once "../lib/Pagehelper.php";
 require_once "../lib/init.php";
-require_once "../lib/logging.php";
 
 $fail = false;
 
 /* Sanity checks */
 
 if(!isset($_GET) || !isset($_GET['source'])){
-	warn("Missing source",__FILE__);
+	Log::warn("Missing source");
 	$fail = true;
 }
 
@@ -34,7 +34,7 @@ $source=$_GET['source'];
 
 if(false === $fail){
 	if(!isset($source) || !in_array($source, $sources)){
-		warn("Invalid source: ".$source,__FILE__);
+		Log::warn("Invalid source: ".$source);
 		$fail = true;
 	}
 }
@@ -82,7 +82,7 @@ if(false === $fail){
 		$output = $graph->saveVerbose();
 	} catch(Exception $e){
 		$fail = true;
-		warn("Could not generate graph for: $source, ".$e->getMessage(),__FILE__);
+		Log::warn("Could not generate graph for: $source, ".$e->getMessage());
 	}
 }
   
@@ -90,11 +90,33 @@ if(false === $fail){
 /* Output graph */
 
 if(false === $fail){
-	header("Content-Type: image/png");
+	Pagehelper::header_png();
 	echo $output['image'];
 }
 else{
-	print "graph_render.php: Could not display graph";
+	/* Generate an error image */
+	
+	$canvas = imagecreate( 400, 100 );
+	$red = imagecolorallocate( $canvas, 255, 0, 0 );
+	$white = imagecolorallocate( $canvas, 255, 255, 255 );
+
+	imagefilledrectangle( $canvas, 9, 9, 389, 89, $white );
+
+	$font = "/usr/share/fonts/truetype/freefont/FreeSansOblique.ttf";
+	$text = "Graph Error ($source), check log";
+	$size = "15";
+
+	$box = imageftbbox( $size, 0, $font, $text );
+	$x = (400 - ($box[2] - $box[0])) / 2;
+	$y = (100 - ($box[1] - $box[7])) / 2;
+	$y -= $box[7];
+
+	imageTTFText( $canvas, $size, 0, $x, $y, $red, $font, $text );
+	
+	imagepng( $canvas, NULL);
+
+	imagedestroy( $canvas ); 
+	
 }
 
  

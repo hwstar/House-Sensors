@@ -21,8 +21,7 @@
  */
 
 $path  = dirname(realpath((dirname(__FILE__))));
-require_once "../lib/logging.php";
-require_once "../lib/init.php";
+require_once "$path/init.php";
 
 
 print "Initializing rrd file: ".$rrdfile."\n";

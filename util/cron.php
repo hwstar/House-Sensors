@@ -20,9 +20,25 @@
  */
 
 $path  = dirname(realpath((dirname(__FILE__))));
+
+require_once "$path/lib/Log.php";
 require_once "$path/lib/init.php";
-require_once "$path/lib/logging.php";
-require_once "$path/lib/db.php";
+
+$db = $config['general']['db'];
+$dsn = "sqlite:".$db;
+
+
+if(false === file_exists($db)){
+	Log::fatal("Database file: ".$db." does not exist");
+}
+
+try{
+	$pdo = new PDO($dsn);
+}
+catch(Exception $e){
+	Log::fatal("Could not open database file ".$config['general']['db'].": ".$e->getMessage());
+}
+
 
 if(false === file_exists($rrdfile)){
 	$initscript = $utildir."/rrdinit.php";
@@ -34,7 +50,7 @@ if(false === file_exists($rrdfile)){
 try{
 	$rra = new RRDUpdater($rrdfile);
 } catch(Exception $e){
-	fatal("Could not access RRA in file: ".$rrdfile.": ".$e->getMessage(),__FILE__);
+	Log::fatal("Could not access RRA in file: ".$rrdfile.": ".$e->getMessage());
 }
 
 $updates = array();
@@ -54,7 +70,7 @@ foreach($sources as $src){
 		$row = $sth->fetch(PDO::FETCH_ASSOC);
 		
 	} catch (Exception $e){
-		fatal("Could not query database: ".$e->getMessage(),__FILE__);
+		Log::fatal("Could not query database: ".$e->getMessage());
 	}
 	if(isset($row['value'])){
 		$v = $row['value'];
@@ -62,21 +78,21 @@ foreach($sources as $src){
 			$scale_function = $config[$src]['scale-function'];
 			$v = eval("return( ".$scale_function." );");
 			if(false === $v){
-				warn("Bad scale function in source ".$src, __FILE__);
+				Log::warn("Bad scale function in source ".$src);
 				$v = 0;
 			}		
 		}
 		$updates[$src] = $v;
 	}
 	else{
-		warn("key $k returned nothing",__FILE__);
+		Log::warn("key $k returned nothing");
 	}
 }
 if(count($updates) > 0){
 	try{
 		$rra->update($updates);
 	} catch (Exception $e){
-		fatal("Could not update rra: ".$e->getMessage(),__FILE__);
+		Log::fatal("Could not update rra: ".$e->getMessage());
 	}
 }
 exit( 0 );

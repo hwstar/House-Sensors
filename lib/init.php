@@ -29,11 +29,11 @@ $config = parse_ini_file($cfgloc."/hs.conf", 1);
 /* In no config file, exit */
 
 if(false === $config){
-	error_log("init.php: Can't read config file $cfgloc/hs.conf");
+	Log::fatal("Can't read config file $cfgloc/hs.conf");
 }
 
 if(false === array_key_exists("general", $config)){
-	error_log("init.php: Config file missing general section");
+	Log::fatal("Config file missing general section");
 }
 
 /* Set general defaults */

@@ -18,15 +18,33 @@
  * 
  */
 
+
+require_once "../lib/Log.php";
+require_once "../lib/Usermsgs.php";
+require_once "../lib/Pagehelper.php";
 require_once "../lib/init.php";
-require_once "../lib/logging.php";
-require_once "../lib/db.php";
 
-/* PHP init */
+Pagehelper::header_no_cache();
+Pagehelper::html_open_tags("hs.css", "favicon.ico");	
 
-header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1.
-header('Pragma: no-cache'); // HTTP 1.0.
-header('Expires: 0'); // Proxies.
+$db = $config['general']['db'];
+$dsn = "sqlite:".$db;
+
+
+if(false === file_exists($db)){
+	Usermsgs::error("Could not find database file!");
+	Log::fatal("Database file: ".$db." does not exist");
+}
+
+try{
+	$pdo = new PDO($dsn);
+}
+catch(Exception $e){
+	Usermsgs::error("Could not open database file!");
+	Log::fatal("Could not open database file ".$config['general']['db'].": ".$e->getMessage());
+}
+
+
 
 
 /* PHP Functions */
@@ -42,7 +60,12 @@ function display_table($category)
 	foreach($category as $src){
 		$key = $config[$src]['key'];
 		$table = $config['general']['table'];
-		$result = $pdo->query("SELECT * FROM $table WHERE source='$key'");
+		try{
+			$result = $pdo->query("SELECT * FROM $table WHERE source='$key'");
+		} catch(Exception $e){
+			Usermsgs::warning("Database query failed!");
+			Log::warn("Could not query database".$config['general']['db'].": ".$e->getMessage());
+		}
 		if(false !== $result){
 			if(0 === $i){
 				$heading = $config[$src]['category'];
@@ -85,30 +108,11 @@ function display_category($category)
 	
 }
 
-	
-?>
-
-<!-- Static HTML open tags -->
-
-<!DOCTYPE html>
-<html>
-<head>
-<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-<link rel="icon" href="/favicon.ico" type="image/x-icon">
-<link rel="stylesheet" type="text/css" href="hs.css">
-</head>
-<body>
-	
-<?php
-/* PHP main line code */
 foreach($categories as $cat){
 	display_category($cat);
 }
-	
+
+Pagehelper::html_close_tags();
 
 ?>
-<!-- Static HTML closing tags -->
-	
-</body>
-</html>
 	
