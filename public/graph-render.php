@@ -22,14 +22,18 @@ require_once "../lib/init.php";
 
 $fail = false;
 
+
+
 /* Sanity checks */
 
 if(!isset($_GET) || !isset($_GET['source'])){
 	Log::warn("Missing source");
 	$fail = true;
+	$source = "";
 }
-
-$source=$_GET['source'];
+else{
+	$source=$_GET['source'];
+}
 
 
 if(false === $fail){
@@ -88,9 +92,8 @@ if(false === $fail){
   
 
 /* Output graph */
-
+Pagehelper::header_png();
 if(false === $fail){
-	Pagehelper::header_png();
 	echo $output['image'];
 }
 else{
